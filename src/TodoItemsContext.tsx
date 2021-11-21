@@ -6,10 +6,15 @@ import {
     useReducer,
 } from 'react';
 
+export type Tag = 'work' | 'important' | 'home' | 'hobby'| 'other';
+
+export const TAGS: Tag[] = [ 'work', 'important', 'home', 'hobby', 'other' ];
+
 export interface TodoItem {
     id: string;
     title: string;
     details?: string;
+    tag: Tag;
     done: boolean;
 }
 
