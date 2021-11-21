@@ -70,9 +70,9 @@ export const TodoItemsList = function () {
         return 0;
     });
 
-    const handleChange = (event: ChangeEvent<{ value: unknown }>) => {
+    const handleChange = useCallback((event: ChangeEvent<{ value: unknown }>) => {
         setTags(event.target.value as string[]);
-    };
+    }, [setTags]);
 
     return (
         <div className={classes.root}>
