@@ -63,9 +63,9 @@ export const TodoItemsContextProvider = ({
 
         saveState();
 
-        window.addEventListener('storage', () => {
-            saveState();
-        });
+        window.addEventListener('storage', saveState);
+
+        return () => window.removeEventListener('storage', saveState);
     }, []);
 
     useEffect(() => {
