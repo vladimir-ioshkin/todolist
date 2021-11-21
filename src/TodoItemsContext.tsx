@@ -4,6 +4,9 @@ import {
     useContext,
     useEffect,
     useReducer,
+    useState,
+    Dispatch,
+    SetStateAction,
 } from 'react';
 
 export type Tag = 'work' | 'important' | 'home' | 'hobby'| 'other';
@@ -28,7 +31,12 @@ interface TodoItemsAction {
 }
 
 const TodoItemsContext = createContext<
-    (TodoItemsState & { dispatch: (action: TodoItemsAction) => void }) | null
+    (TodoItemsState & { 
+        dispatch: (action: TodoItemsAction) => void, 
+        isQuotaExceeded: boolean, 
+        setIsQuotaExceeded: Dispatch<SetStateAction<boolean>>,
+        clearStorage: () => void, 
+    }) | null
 >(null);
 
 const defaultState = { todoItems: [] };
@@ -39,6 +47,7 @@ export const TodoItemsContextProvider = ({
 }: {
     children?: ReactNode;
 }) => {
+    const [isQuotaExceeded, setIsQuotaExceeded] = useState<boolean>(false);
     const [state, dispatch] = useReducer(todoItemsReducer, defaultState);
 
     useEffect(() => {
@@ -60,11 +69,25 @@ export const TodoItemsContextProvider = ({
     }, []);
 
     useEffect(() => {
-        localStorage.setItem(localStorageKey, JSON.stringify(state));
+        try {
+            localStorage.setItem(localStorageKey, JSON.stringify(state));
+        } catch(error) {
+            setIsQuotaExceeded(true);
+        }
     }, [state]);
 
+    const clearStorage = () => {
+        localStorage.clear();
+    };
+
     return (
-        <TodoItemsContext.Provider value={{ ...state, dispatch }}>
+        <TodoItemsContext.Provider value={{ 
+            ...state, 
+            dispatch, 
+            isQuotaExceeded, 
+            setIsQuotaExceeded, 
+            clearStorage,
+        }}>
             {children}
         </TodoItemsContext.Provider>
     );

@@ -1,11 +1,11 @@
-import React from 'react';
 import Container from '@material-ui/core/Container';
 import Typography from '@material-ui/core/Typography';
 import { createMuiTheme } from '@material-ui/core/styles';
 import { ThemeProvider } from '@material-ui/styles';
 import { TodoItemsList } from './TodoItems';
-import { TodoItemsContextProvider } from './TodoItemsContext';
+import { TodoItemsContextProvider, useTodoItems } from './TodoItemsContext';
 import TodoItemForm from './TodoItemForm';
+import { QuotaExceededModal } from './QuotaExceededModal';
 
 const theme = createMuiTheme({
     palette: {
@@ -29,6 +29,8 @@ function App() {
 }
 
 function Content() {
+    const { isQuotaExceeded, setIsQuotaExceeded, clearStorage } = useTodoItems();
+    
     return (
         <Container maxWidth="sm">
             <header>
@@ -39,6 +41,11 @@ function Content() {
             <main>
                 <TodoItemForm />
                 <TodoItemsList />
+                <QuotaExceededModal
+                    isOpen={isQuotaExceeded}
+                    setIsQuotaExceeded={setIsQuotaExceeded}
+                    clearStorage={clearStorage}
+                />
             </main>
         </Container>
     );
