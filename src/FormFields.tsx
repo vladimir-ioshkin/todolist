@@ -13,13 +13,15 @@ const useInputStyles = makeStyles(() => ({
     },
 }));
 
-export const FormFields = ({ control, title, details, tag }:
-{ 
-    control: Control,
-    title: string,
-    details: string,
-    tag: Tag,
-}) => {
+export const FormFields = (
+    { control, title, details, tag }:
+    { 
+        control: Control,
+        title: string,
+        details: string,
+        tag: Tag,
+    }
+) => {
     const classes = useInputStyles();
 
     return (

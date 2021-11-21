@@ -1,4 +1,4 @@
-import { ChangeEvent, useCallback, useState } from 'react';
+import { ChangeEvent, useCallback, useState, Dispatch, SetStateAction } from 'react';
 import Card from '@material-ui/core/Card';
 import CardHeader from '@material-ui/core/CardHeader';
 import CardContent from '@material-ui/core/CardContent';
@@ -12,11 +12,13 @@ import InputLabel from '@material-ui/core/InputLabel';
 import FormControl from '@material-ui/core/FormControl';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import DeleteIcon from '@material-ui/icons/Delete';
+import EditIcon from '@material-ui/icons/Edit';
 import { makeStyles } from '@material-ui/core/styles';
 import classnames from 'classnames';
 import { motion } from 'framer-motion';
 import { TAGS, Tag, TodoItem, useTodoItems } from './TodoItemsContext';
 import { TagChip } from './TagChip';
+import { TodoItemModal } from './TodoItemModal';
 
 const spring = {
     type: 'spring',
@@ -46,6 +48,7 @@ const useTodoItemListStyles = makeStyles({
 export const TodoItemsList = function () {
     const [ tags, setTags ] = useState<string[]>([]);
     const { todoItems } = useTodoItems();
+    const [ editingItem, setEditingItem ] = useState<null | TodoItem>(null);
 
     const classes = useTodoItemListStyles();
     
@@ -103,10 +106,16 @@ export const TodoItemsList = function () {
             <ul className={classes.list}>
                 {sortedItems.map((item) => (
                     <motion.li key={item.id} transition={spring} layout={true}>
-                        <TodoItemCard item={item} />
+                        <TodoItemCard item={item} setEditingItem={setEditingItem} />
                     </motion.li>
                 ))}
             </ul>
+            {editingItem && (
+                <TodoItemModal
+                    editingItem={editingItem}
+                    setEditingItem={setEditingItem}
+                />
+            )}
         </div>
     );
 };
@@ -122,9 +131,22 @@ const useTodoItemCardStyles = makeStyles({
     },
 });
 
-export const TodoItemCard = function ({ item }: { item: TodoItem }) {
+export const TodoItemCard = function (
+    { item, setEditingItem }: 
+    { 
+        item: TodoItem, 
+        setEditingItem: Dispatch<SetStateAction<TodoItem | null>> 
+    }
+) {
     const classes = useTodoItemCardStyles();
     const { dispatch } = useTodoItems();
+
+    const handleEdit = useCallback(
+        () => {
+            setEditingItem(item);
+        },
+        [setEditingItem, item]
+    );
 
     const handleDelete = useCallback(
         () => dispatch({ type: 'delete', data: { id: item.id } }),
@@ -148,9 +170,14 @@ export const TodoItemCard = function ({ item }: { item: TodoItem }) {
         >
             <CardHeader
                 action={
-                    <IconButton aria-label="delete" onClick={handleDelete}>
-                        <DeleteIcon />
-                    </IconButton>
+                    <>
+                        <IconButton aria-label="edit" onClick={handleEdit}>
+                            <EditIcon />
+                        </IconButton>
+                        <IconButton aria-label="delete" onClick={handleDelete}>
+                            <DeleteIcon />
+                        </IconButton>
+                    </>
                 }
                 title={
                     <FormControlLabel
